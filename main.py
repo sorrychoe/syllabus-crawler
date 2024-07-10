@@ -1,4 +1,6 @@
+import getpass
 import os
+import platform
 import sys
 from time import sleep
 
@@ -8,7 +10,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 
-from faculty import faculty_dict
+from faculty import faculty_dict, faculty_info
 
 
 def get_driver():
@@ -42,6 +44,11 @@ def login_action(hisnet_id: str, pwd: str, driver):
     driver.find_element(By.CSS_SELECTOR, "input[src='/2012_images/intro/btn_login.gif']").click()
     sleep(5)
 
+    if platform.system() == "Windows":
+        os.system('cls')
+    else:
+        os.system('clear')
+
 
 def course_info(base_url: str, year: str, term: str, faculty: str, driver):
     """get the information of course"""
@@ -70,18 +77,24 @@ def main(base_url: str):
     sleep(3)
 
     try:
-        hisnet_id = input("HISNet ID를 입력하시오: ")
-        pwd = input("Password를 입력하시오: ")
+        print("         ")
+        hisnet_id = input("\033[32m" + "HISNet ID를 입력하시오: " + "\033[0m")
+        pwd = getpass.getpass("\033[32m" + "Password를 입력하시오: " + "\033[0m")
 
         login_action(hisnet_id, pwd, driver)
 
-        answer = input("조회를 원하는 학기와 연도를 다음 형식에 맞춰 입력하시오 (ex: 2021-2): ")
+        answer = input("\033[32m" + "조회를 원하는 학기와 연도를 다음 형식에 맞춰 입력하시오 (ex: 2021-2): " + "\033[0m")
         year = answer.split("-")[0]
         term = answer.split("-")[1]
-        faculty = input("조회를 원하는 학부의 이름을 입력하시오 (전체 입력시, 모든 학부의 정보 조회 가능): ")
+        print("===============================")
+        for num in faculty_info:
+            print(f"{num}: {faculty_info[num]}")
+        print("===============================")
+        faculty_num = input("\033[32m" + "상단의 리스트를 참고하여 해당하는 학부를 선택하시오: " + "\033[0m")
+        faculty = faculty_info[faculty_num]
         cce=" "
 
-        if "전체" in faculty:
+        if faculty == "전체":
             faculty = "%C0%FC%C3%BC"
             faculty_code = "%C0%FC%C3%BC"
         elif faculty == "AI융합교육원":
@@ -92,11 +105,12 @@ def main(base_url: str):
             faculty_code = "%C0%FC%C3%BC"
         else:
             faculty_code = faculty_dict[faculty]
+
         course_info(base_url, year, term, faculty, driver)
 
     except:
         driver.quit()
-        print("중간에 문제가 발생하였습니다.")
+        print("\033[31m" + "중간에 문제가 발생하였습니다." + "\033[0m")
         sys.exit("ERROR OCCUR")
 
     try:
@@ -124,8 +138,12 @@ def main(base_url: str):
 
     except Exception:
         driver.quit()
+        print("             ")
+        print("\033[96m" + "현재 강의계획서가 등록된 강좌 정보" + "\033[0m")
+        print("=========================")
         for course in course_list:
             print(course)
+        print("=========================")
 
 
 if __name__ == "__main__":
