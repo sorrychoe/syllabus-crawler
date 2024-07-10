@@ -71,6 +71,7 @@ def clear():
         os.system('cls')
     else:
         os.system('clear')
+    sleep(0.5)
 
 
 def main(base_url: str):
@@ -120,6 +121,8 @@ def main(base_url: str):
         course_list = []
         page_num = 1
         while True:
+            clear()
+            print("\033[31m" + "데이터 추출 중...." + "\033[0m")
             for cont in range(2, 17):
                 course_id_path = f"table[id='att_list'] > tbody > tr:nth-child({cont}) > td:nth-child(2)"
                 course_name_path = f"table[id='att_list'] > tbody > tr:nth-child({cont}) > td:nth-child(4)"
@@ -142,7 +145,7 @@ def main(base_url: str):
     except Exception:
         driver.quit()
         clear()
-        print("\033[96m" + "현재 강의계획서가 등록된 강좌 정보" + "\033[0m")
+        print("\033[96m" + "현재 강의계획서가 등록된 과목 정보" + "\033[0m")
         print("=========================")
         for course in course_list:
             print(course)
