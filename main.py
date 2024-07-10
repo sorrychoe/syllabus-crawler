@@ -33,7 +33,7 @@ def get_driver():
     return driver
 
 
-def login_action(hisnet_id: str, pwd: str, driver):
+def login_action(hisnet_id: str, pwd: str, driver: any):
     """login to hisnet"""
     driver.switch_to.frame('MainFrame')
 
@@ -46,7 +46,7 @@ def login_action(hisnet_id: str, pwd: str, driver):
     clear()
 
 
-def course_info(base_url: str, year: str, term: str, faculty: str, driver):
+def course_info(base_url: str, year: str, term: str, faculty: str, driver: any):
     """get the information of course"""
     driver.get(base_url)
     sleep(3)
