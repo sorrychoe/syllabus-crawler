@@ -43,11 +43,7 @@ def login_action(hisnet_id: str, pwd: str, driver):
 
     driver.find_element(By.CSS_SELECTOR, "input[src='/2012_images/intro/btn_login.gif']").click()
     sleep(5)
-
-    if platform.system() == "Windows":
-        os.system('cls')
-    else:
-        os.system('clear')
+    clear()
 
 
 def course_info(base_url: str, year: str, term: str, faculty: str, driver):
@@ -68,6 +64,13 @@ def course_info(base_url: str, year: str, term: str, faculty: str, driver):
 
     driver.find_element(By.CSS_SELECTOR, "a[href='javascript:sendit()']").click()
     sleep(3)
+
+
+def clear():
+    if platform.system() == "Windows":
+        os.system('cls')
+    else:
+        os.system('clear')
 
 
 def main(base_url: str):
@@ -138,7 +141,7 @@ def main(base_url: str):
 
     except Exception:
         driver.quit()
-        print("             ")
+        clear()
         print("\033[96m" + "현재 강의계획서가 등록된 강좌 정보" + "\033[0m")
         print("=========================")
         for course in course_list:
