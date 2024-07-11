@@ -26,4 +26,5 @@ run:
 	$(python) main.py
 
 clear:
-	rm -fr __pycache__
+	rm -fr __pycache__/ \
+	rm -fr 126/
