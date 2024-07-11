@@ -1,4 +1,4 @@
-.PHONY: init format lint run clean
+.PHONY: init lint run clean
 
 NAME = syllabus-crawler
 
