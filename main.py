@@ -1,7 +1,7 @@
-import getpass
 import os
 import platform
 import sys
+from getpass import getpass
 from time import sleep
 
 import chromedriver_autoinstaller
@@ -67,6 +67,7 @@ def course_info(base_url: str, year: str, term: str, faculty: str, driver: any):
 
 
 def clear():
+    """clear the terminal"""
     if platform.system() == "Windows":
         os.system('cls')
     else:
@@ -75,7 +76,7 @@ def clear():
 
 
 def main(base_url: str):
-    """crawler generation"""
+    """program activation"""
     driver = get_driver()
     driver.get("https://hisnet.handong.edu/")
     sleep(3)
@@ -83,7 +84,7 @@ def main(base_url: str):
     try:
         print("         ")
         hisnet_id = input("\033[32m" + "HISNet ID를 입력하시오: " + "\033[0m")
-        pwd = getpass.getpass("\033[32m" + "Password를 입력하시오: " + "\033[0m")
+        pwd = getpass("\033[32m" + "Password를 입력하시오: " + "\033[0m")
 
         login_action(hisnet_id, pwd, driver)
 
@@ -143,13 +144,52 @@ def main(base_url: str):
             sleep(1)
 
     except Exception:
-        driver.quit()
         clear()
         print("\033[96m" + "현재 강의계획서가 등록된 과목 정보" + "\033[0m")
         print("=========================")
         for course in course_list:
             print(course)
         print("=========================")
+        print("                         ")
+        ans = input("\033[32m" + "과목의 개요 정보를 조회하시겠습니까(Y/N)?: " + "\033[0m")
+        if (ans == "Y") or (ans == "y"):
+            print("   ")
+            course_ans = input("\033[32m" + "조회를 희망하는 강의의 과목코드를 입력하시요: " + "\033[0m")
+            page_url = f"https://hisnet.handong.edu/SMART/lp_view_4student_1.php?kang_yy={year}&kang_hakgi={term}&kang_hakgwa=0013&kang_code={course_ans}&kang_ban=01&kang_cs_code=&kang_cs_ban="
+            driver.get(page_url)
+            sleep(1)
+            clear()
+
+            summary = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(13) > tbody > tr > td").text
+            attendance = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(1)").text
+            midterm = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(2)").text
+            final = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(3)").text
+            quiz = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(4)").text
+            team_project = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(5)").text
+            assignment = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(6)").text
+            etc1 = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(7)").text
+            etc2 = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(8)").text
+
+            print("     ")
+            print("\033[36m" + "강의 개요" + "\033[0m")
+            print("\033[31m" + "=========================" + "\033[0m")
+            print("\033[94m" + summary + "\033[0m")
+            print("\033[31m" + "=========================" + "\033[0m")
+            print("\033[36m" + "강의 평가 기준" + "\033[0m")
+            print("     ")
+            print("\033[95m" + "출석: " + "\033[91m" + f"{attendance}%" + "\033[0m")
+            print("\033[95m" + "중간고사: " + "\033[91m" + f"{midterm}%" + "\033[0m")
+            print("\033[95m" + "기말고사: " + "\033[91m" + f"{final}%" + "\033[0m")
+            print("\033[95m" + "퀴즈: " + "\033[91m" + f"{quiz}%" + "\033[0m")
+            print("\033[95m" + "팀프로젝트: " + "\033[91m" + f"{team_project}%" + "\033[0m")
+            print("\033[95m" + "개인과제: " + "\033[91m" + f"{assignment}%" + "\033[0m")
+            print("\033[95m" + "기타1: " + "\033[91m" + f"{etc1}%" + "\033[0m")
+            print("\033[95m" + "기타2: " + "\033[91m" + f"{etc2}%" + "\033[0m")
+            print("\033[31m" + "=========================" + "\033[0m")
+
+            driver.quit()
+        else:
+            driver.quit()
 
 
 if __name__ == "__main__":
