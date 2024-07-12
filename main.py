@@ -121,9 +121,13 @@ def main(base_url: str):
     try:
         course_list = []
         page_num = 1
+        i=0
         while True:
             clear()
-            print("\033[31m" + "데이터 추출 중...." + "\033[0m")
+            print("\033[31m" + "데이터 추출 중" + "."* i + "\033[0m")
+            i+=1
+            if i==5:
+                i=1
             for cont in range(2, 17):
                 course_id_path = f"table[id='att_list'] > tbody > tr:nth-child({cont}) > td:nth-child(2)"
                 course_name_path = f"table[id='att_list'] > tbody > tr:nth-child({cont}) > td:nth-child(4)"
