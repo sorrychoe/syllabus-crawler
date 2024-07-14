@@ -42,7 +42,7 @@ def login_action(hisnet_id: str, pwd: str, driver: any):
     driver.find_element(By.CSS_SELECTOR, "input[name='password_1']").send_keys(pwd)
 
     driver.find_element(By.CSS_SELECTOR, "input[src='/2012_images/intro/btn_login.gif']").click()
-    sleep(5)
+    sleep(3)
     clear()
 
 
@@ -79,7 +79,7 @@ def main(base_url: str):
     """program activation"""
     driver = get_driver()
     driver.get("https://hisnet.handong.edu/")
-    sleep(3)
+    sleep(2)
 
     try:
         print("         ")
