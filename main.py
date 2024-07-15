@@ -165,7 +165,7 @@ def main(base_url: str):
             clear()
 
             summary = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(13) > tbody > tr > td").text
-            major = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(2) > tbody> tr:nth-child(5) > td.cls_AlignLeft > div > td:nth-child(1)").text
+            major = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(2) > tbody > tr:nth-child(5) > td.cls_AlignLeft > div").text
             attendance = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(1)").text
             midterm = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(2)").text
             final = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(3)").text
@@ -175,12 +175,14 @@ def main(base_url: str):
             etc1 = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(7)").text
             etc2 = driver.find_element(By.CSS_SELECTOR, "div[id='div1'] > div > table:nth-child(20) > tbody> tr:nth-child(3) > td:nth-child(8)").text
 
-            print("     ")
-            print("\033[36m" + "강의 개요" + "\033[0m")
             print("\033[31m" + "=========================" + "\033[0m")
+            print("\033[36m" + "강의 개요" + "\033[0m")
+            print("     ")
             print("\033[94m" + summary + "\033[0m")
             print("\033[31m" + "=========================" + "\033[0m")
-            print("\033[94m" + "인정 전공: " + "\033[95m" + major + "\033[0m")
+            print("\033[36m" + "인정 전공"+ "\033[0m")
+            print("     ")
+            print("\033[94m" + major + "\033[0m")
             print("\033[31m" + "=========================" + "\033[0m")
             print("\033[36m" + "강의 평가 기준" + "\033[0m")
             print("     ")
