@@ -38,9 +38,9 @@ def get_driver():
     chrome_options = Options()
     chrome_options.add_experimental_option("prefs", {"download.default_directory": os.getcwd()})
 
-    # options = ["--headless", "--no-sandbox"]
-    # for option in options:
-    #     chrome_options.add_argument(option)
+    options = ["--headless", "--no-sandbox"]
+    for option in options:
+        chrome_options.add_argument(option)
     driver = webdriver.Chrome(options=chrome_options)
     return driver
 
