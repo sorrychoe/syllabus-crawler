@@ -5,12 +5,24 @@ from getpass import getpass
 from time import sleep
 
 import chromedriver_autoinstaller
+import pyperclip
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
 from faculty import faculty_dict, faculty_info
+
+if platform.system() in ["Windows", "Linux"]:
+    Control = Keys.CONTROL
+
+elif platform.system() == "Darwin":
+    Control = Keys.COMMAND
+
+else:
+    print("Unsupported OS.")
 
 
 def get_driver():
@@ -26,24 +38,32 @@ def get_driver():
     chrome_options = Options()
     chrome_options.add_experimental_option("prefs", {"download.default_directory": os.getcwd()})
 
-    options = ["--headless", "--no-sandbox"]
-    for option in options:
-        chrome_options.add_argument(option)
+    # options = ["--headless", "--no-sandbox"]
+    # for option in options:
+    #     chrome_options.add_argument(option)
     driver = webdriver.Chrome(options=chrome_options)
     return driver
 
 
 def login_action(hisnet_id: str, pwd: str, driver: any):
     """login to hisnet"""
-    driver.switch_to.frame('MainFrame')
+    try:
+        driver.switch_to.frame('MainFrame')
 
-    driver.find_element(By.CSS_SELECTOR, "input[name='id_1']").send_keys(hisnet_id)
+        driver.find_element(By.CSS_SELECTOR, "#loginBoxBg > table:nth-child(2) > tbody > tr > td:nth-child(5) > form > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2) > span > input[type=text]").click()
 
-    driver.find_element(By.CSS_SELECTOR, "input[name='password_1']").send_keys(pwd)
+        pyperclip.copy(hisnet_id)
+        ActionChains(driver).key_down(Control).send_keys('v').key_up(Control).perform()
 
-    driver.find_element(By.CSS_SELECTOR, "input[src='/2012_images/intro/btn_login.gif']").click()
-    sleep(3)
-    clear()
+        driver.find_element(By.CSS_SELECTOR, " #loginBoxBg > table:nth-child(2) > tbody > tr > td:nth-child(5) > form > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(3) > td:nth-child(2) > input[type=password]").click()
+        pyperclip.copy(pwd)
+        ActionChains(driver).key_down(Control).send_keys('v').key_up(Control).perform()
+
+        driver.find_element(By.CSS_SELECTOR, "input[src='/2012_images/intro/btn_login.gif']").click()
+        sleep(3)
+        clear()
+    except Exception as e:
+        print(e)
 
 
 def course_info(base_url: str, year: str, term: str, faculty: str, driver: any):
