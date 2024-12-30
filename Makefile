@@ -27,4 +27,4 @@ run:
 
 clear:
 	rm -fr __pycache__/ \
-	rm -fr 128/
+	rm -fr */chromedriver
