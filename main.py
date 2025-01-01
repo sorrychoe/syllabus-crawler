@@ -50,12 +50,11 @@ def login_action(hisnet_id: str, pwd: str, driver: any):
     try:
         driver.switch_to.frame('MainFrame')
 
-        driver.find_element(By.CSS_SELECTOR, "#loginBoxBg > table:nth-child(2) > tbody > tr > td:nth-child(5) > form > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2) > span > input[type=text]").click()
-
+        driver.find_element(By.XPATH, '//*[@id="loginBoxBg"]/table[2]/tbody/tr/td[5]/form/table/tbody/tr[3]/td/table/tbody/tr/td[1]/table/tbody/tr[1]/td[2]/span/input').click()
         pyperclip.copy(hisnet_id)
         ActionChains(driver).key_down(Control).send_keys('v').key_up(Control).perform()
 
-        driver.find_element(By.CSS_SELECTOR, " #loginBoxBg > table:nth-child(2) > tbody > tr > td:nth-child(5) > form > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(3) > td:nth-child(2) > input[type=password]").click()
+        driver.find_element(By.XPATH, '//*[@id="loginBoxBg"]/table[2]/tbody/tr/td[5]/form/table/tbody/tr[3]/td/table/tbody/tr/td[1]/table/tbody/tr[3]/td[2]/input').click()
         pyperclip.copy(pwd)
         ActionChains(driver).key_down(Control).send_keys('v').key_up(Control).perform()
 
@@ -133,7 +132,7 @@ def main(base_url: str):
 
         course_info(base_url, year, term, faculty, driver)
 
-    except:
+    except :
         driver.quit()
         print("\033[31m" + "중간에 문제가 발생하였습니다." + "\033[0m")
         sys.exit("ERROR OCCUR")
