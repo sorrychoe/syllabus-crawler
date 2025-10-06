@@ -40,12 +40,12 @@ def get_driver():
     chrome_options = Options()
     chrome_options.add_experimental_option("prefs", {"download.default_directory": os.getcwd()})
 
-    options = ["--headless=new", "--no-sandbox", "--window-size=1920,1080", "--disable-gpu"]
-    for option in options:
-        chrome_options.add_argument(option)
+    # options = ["--headless=new", "--no-sandbox", "--window-size=1920,1080", "--disable-gpu"]
+    # for option in options:
+    #     chrome_options.add_argument(option)
 
-    agent = "Mozilla/5.0 (compatible; Yeti/1.1; +http://naver.me/bot)"
-    chrome_options.add_argument(f"user agent: {agent}")
+    # agent = "Mozilla/5.0 (compatible; Yeti/1.1; +http://naver.me/bot)"
+    # chrome_options.add_argument(f"user agent: {agent}")
 
     driver = webdriver.Chrome(options=chrome_options)
     return driver
