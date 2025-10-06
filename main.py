@@ -11,7 +11,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.ui import WebDriverWait
 
 from faculty import faculty_dict, faculty_info
 
@@ -38,9 +40,13 @@ def get_driver():
     chrome_options = Options()
     chrome_options.add_experimental_option("prefs", {"download.default_directory": os.getcwd()})
 
-    options = ["--headless", "--no-sandbox"]
+    options = ["--headless=new", "--no-sandbox", "--window-size=1920,1080", "--disable-gpu"]
     for option in options:
         chrome_options.add_argument(option)
+
+    agent = "Mozilla/5.0 (compatible; Yeti/1.1; +http://naver.me/bot)"
+    chrome_options.add_argument(f"user agent: {agent}")
+
     driver = webdriver.Chrome(options=chrome_options)
     return driver
 
@@ -60,9 +66,12 @@ def login_action(hisnet_id: str, pwd: str, driver: any):
 
         driver.find_element(By.CSS_SELECTOR, "input[src='/2012_images/intro/btn_login.gif']").click()
         sleep(3)
-        clear()
-    except Exception as e:
-        print(e)
+
+        WebDriverWait(driver, 10).until(EC.url_contains('main.php'))
+        print("✅ 로그인 성공!")
+    except Exception:
+        print("❌ 로그인 실패!")
+        sys.exit("ERROR OCCUR")
 
 
 def course_info(base_url: str, year: str, term: str, faculty: str, driver: any):
@@ -121,9 +130,6 @@ def main(base_url: str):
         if faculty == "전체":
             faculty = "%C0%FC%C3%BC"
             faculty_code = "%C0%FC%C3%BC"
-        elif faculty == "AI융합교육원":
-            faculty = "AI융합교육원(공학)"
-            faculty_code = faculty_dict[faculty]
         elif faculty == "창의융합교육원":
             cce = "CCE"
             faculty_code = "%C0%FC%C3%BC"
@@ -132,9 +138,10 @@ def main(base_url: str):
 
         course_info(base_url, year, term, faculty, driver)
 
-    except :
+    except Exception as e:
         driver.quit()
         print("\033[31m" + "중간에 문제가 발생하였습니다." + "\033[0m")
+        print(e)
         sys.exit("ERROR OCCUR")
 
     try:
