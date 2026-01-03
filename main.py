@@ -40,12 +40,12 @@ def get_driver():
     chrome_options = Options()
     chrome_options.add_experimental_option("prefs", {"download.default_directory": os.getcwd()})
 
-    # options = ["--headless=new", "--no-sandbox", "--window-size=1920,1080", "--disable-gpu"]
-    # for option in options:
-    #     chrome_options.add_argument(option)
+    options = ["--headless=new", "--no-sandbox", "--window-size=1920,1080", "--disable-gpu"]
+    for option in options:
+        chrome_options.add_argument(option)
 
-    # agent = "Mozilla/5.0 (compatible; Yeti/1.1; +http://naver.me/bot)"
-    # chrome_options.add_argument(f"user agent: {agent}")
+    agent = "Mozilla/5.0 (compatible; Yeti/1.1; +http://naver.me/bot)"
+    chrome_options.add_argument(f"user agent: {agent}")
 
     driver = webdriver.Chrome(options=chrome_options)
     return driver
@@ -64,14 +64,19 @@ def login_action(hisnet_id: str, pwd: str, driver: any):
         pyperclip.copy(pwd)
         ActionChains(driver).key_down(Control).send_keys('v').key_up(Control).perform()
 
+        screenshot_path = "final_debug_screenshot.png"
+        driver.save_screenshot(screenshot_path)
+        print(f"📸 스크린샷 저장 완료: {screenshot_path} 파일을 확인하세요!")
+
         driver.find_element(By.CSS_SELECTOR, "input[src='/2012_images/intro/btn_login.gif']").click()
         sleep(3)
 
+        driver.get("https://hisnet.handong.edu/for_student/main.php")
+
         WebDriverWait(driver, 10).until(EC.url_contains('main.php'))
         print("✅ 로그인 성공!")
-    except Exception:
+    except :
         print("❌ 로그인 실패!")
-        sys.exit("ERROR OCCUR")
 
 
 def course_info(base_url: str, year: str, term: str, faculty: str, driver: any):
