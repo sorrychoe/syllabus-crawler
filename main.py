@@ -17,7 +17,17 @@ from faculty import faculty_dict, faculty_info
 
 
 def get_driver():
-    """driver setup"""
+    """Set up and return a configured Selenium Chrome WebDriver.
+
+    Detects the installed Chrome major version, installs a matching
+    chromedriver if one is not already present under ``./<version>/``,
+    then builds a headless Chrome instance with a fixed window size,
+    a download directory set to the current working directory, and a
+    Naver Yeti bot user-agent string.
+
+    Returns:
+        selenium.webdriver.Chrome: The initialized WebDriver instance.
+    """
     chrome_ver = chromedriver_autoinstaller.get_chrome_version().split(".")[0]
     driver_path = f"./{chrome_ver}/chromedriver"
     if os.path.exists(driver_path):
@@ -41,7 +51,22 @@ def get_driver():
 
 
 def login_action(hisnet_id: str, pwd: str, driver: any):
-    """login to hisnet"""
+    """Log in to the HISNet student portal.
+
+    Switches into the ``MainFrame`` iframe, fills the id and password
+    fields, submits the login form, and then navigates to the student
+    main page, waiting until the URL confirms the page has loaded.
+
+    Args:
+        hisnet_id: HISNet account id.
+        pwd: HISNet account password.
+        driver: Active Selenium WebDriver positioned on the HISNet
+            home page.
+
+    Raises:
+        Exception: Re-raised if any step of the login flow fails
+            (e.g. a form field is missing or the redirect times out).
+    """
     try:
         driver.switch_to.frame('MainFrame')
 
@@ -68,7 +93,22 @@ def login_action(hisnet_id: str, pwd: str, driver: any):
 
 
 def course_info(base_url: str, year: str, term: str, faculty: str, driver: any):
-    """get the information of course"""
+    """Run the course search form for the given year, term, and faculty.
+
+    Opens the course listing page, selects the academic year and term,
+    narrows the search by faculty, and submits the form. The whole
+    catalog is searched when ``faculty`` is the URL-encoded value for
+    "전체"; the "창의융합교육원" case filters by the ``CCE`` subject-code
+    prefix instead of the faculty dropdown.
+
+    Args:
+        base_url: URL of the course listing page (PLES330M.php).
+        year: Academic year as shown in the dropdown (e.g. "2021").
+        term: Academic term as shown in the dropdown (e.g. "2").
+        faculty: Faculty name matching the dropdown text, the
+            URL-encoded "전체" sentinel, or "창의융합교육원".
+        driver: Active, logged-in Selenium WebDriver.
+    """
     driver.get(base_url)
     sleep(3)
 
@@ -88,7 +128,11 @@ def course_info(base_url: str, year: str, term: str, faculty: str, driver: any):
 
 
 def clear():
-    """clear the terminal"""
+    """Clear the terminal screen.
+
+    Runs ``cls`` on Windows and ``clear`` elsewhere, then pauses
+    briefly so rapid successive clears stay readable.
+    """
     if platform.system() == "Windows":
         os.system('cls')
     else:
@@ -97,7 +141,24 @@ def clear():
 
 
 def main(base_url: str):
-    """program activation"""
+    """Run the interactive syllabus-crawler workflow end to end.
+
+    Prompts for HISNet credentials and logs in, asks for the target
+    "year-term" and faculty, then pages through the course listing and
+    collects courses whose syllabus is registered ("조회"). Prints the
+    collected courses and, on request, opens one course's syllabus to
+    print its overview, recognized major, and grading breakdown
+    (attendance, midterm, final, quiz, team project, assignment, and
+    two "기타" categories). The WebDriver is always closed before the
+    function returns or exits.
+
+    Args:
+        base_url: URL of the course listing page (PLES330M.php).
+
+    Raises:
+        SystemExit: If an error occurs during login or the initial
+            course search; the driver is quit first.
+    """
     driver = get_driver()
     driver.get("https://hisnet.handong.edu/")
     sleep(2)
