@@ -1,30 +1,19 @@
 import os
 import platform
+import re
 import sys
 from getpass import getpass
 from time import sleep
 
 import chromedriver_autoinstaller
-import pyperclip
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
 from faculty import faculty_dict, faculty_info
-
-if platform.system() in ["Windows", "Linux"]:
-    Control = Keys.CONTROL
-
-elif platform.system() == "Darwin":
-    Control = Keys.COMMAND
-
-else:
-    print("Unsupported OS.")
 
 
 def get_driver():
@@ -40,12 +29,12 @@ def get_driver():
     chrome_options = Options()
     chrome_options.add_experimental_option("prefs", {"download.default_directory": os.getcwd()})
 
-    options = ["--headless=new", "--no-sandbox", "--window-size=1920,1080", "--disable-gpu"]
+    options = ["--headless=new", "--window-size=1920,1080", "--disable-gpu"]
     for option in options:
         chrome_options.add_argument(option)
 
     agent = "Mozilla/5.0 (compatible; Yeti/1.1; +http://naver.me/bot)"
-    chrome_options.add_argument(f"user agent: {agent}")
+    chrome_options.add_argument(f"--user-agent={agent}")
 
     driver = webdriver.Chrome(options=chrome_options)
     return driver
@@ -56,17 +45,15 @@ def login_action(hisnet_id: str, pwd: str, driver: any):
     try:
         driver.switch_to.frame('MainFrame')
 
-        driver.find_element(By.XPATH, '//*[@id="loginBoxBg"]/table[2]/tbody/tr/td[5]/form/table/tbody/tr[3]/td/table/tbody/tr/td[1]/table/tbody/tr[1]/td[2]/span/input').click()
-        pyperclip.copy(hisnet_id)
-        ActionChains(driver).key_down(Control).send_keys('v').key_up(Control).perform()
+        id_field = driver.find_element(By.XPATH, '//*[@id="loginBoxBg"]/table[2]/tbody/tr/td[5]/form/table/tbody/tr[3]/td/table/tbody/tr/td[1]/table/tbody/tr[1]/td[2]/span/input')
+        id_field.click()
+        id_field.clear()
+        id_field.send_keys(hisnet_id)
 
-        driver.find_element(By.XPATH, '//*[@id="loginBoxBg"]/table[2]/tbody/tr/td[5]/form/table/tbody/tr[3]/td/table/tbody/tr/td[1]/table/tbody/tr[3]/td[2]/input').click()
-        pyperclip.copy(pwd)
-        ActionChains(driver).key_down(Control).send_keys('v').key_up(Control).perform()
-
-        screenshot_path = "final_debug_screenshot.png"
-        driver.save_screenshot(screenshot_path)
-        print(f"📸 스크린샷 저장 완료: {screenshot_path} 파일을 확인하세요!")
+        pwd_field = driver.find_element(By.XPATH, '//*[@id="loginBoxBg"]/table[2]/tbody/tr/td[5]/form/table/tbody/tr[3]/td/table/tbody/tr/td[1]/table/tbody/tr[3]/td[2]/input')
+        pwd_field.click()
+        pwd_field.clear()
+        pwd_field.send_keys(pwd)
 
         driver.find_element(By.CSS_SELECTOR, "input[src='/2012_images/intro/btn_login.gif']").click()
         sleep(3)
@@ -75,8 +62,9 @@ def login_action(hisnet_id: str, pwd: str, driver: any):
 
         WebDriverWait(driver, 10).until(EC.url_contains('main.php'))
         print("✅ 로그인 성공!")
-    except :
+    except Exception as e:
         print("❌ 로그인 실패!")
+        raise e
 
 
 def course_info(base_url: str, year: str, term: str, faculty: str, driver: any):
@@ -121,9 +109,10 @@ def main(base_url: str):
 
         login_action(hisnet_id, pwd, driver)
 
-        answer = input("\033[32m" + "조회를 원하는 학기와 연도를 다음 형식에 맞춰 입력하시오 (ex: 2021-2): " + "\033[0m")
-        year = answer.split("-")[0]
-        term = answer.split("-")[1]
+        answer = input("\033[32m" + "조회를 원하는 학기와 연도를 다음 형식에 맞춰 입력하시오 (ex: 2021-2): " + "\033[0m").strip()
+        if not re.fullmatch(r"\d{4}-[1-4]", answer):
+            raise ValueError("연도-학기 형식이 올바르지 않습니다 (ex: 2021-2)")
+        year, term = answer.split("-")
         print("===============================")
         for num in faculty_info:
             print(f"{num}: {faculty_info[num]}")
@@ -189,7 +178,11 @@ def main(base_url: str):
         ans = input("\033[32m" + "과목의 개요 정보를 조회하시겠습니까(Y/N)?: " + "\033[0m")
         if (ans == "Y") or (ans == "y"):
             print("   ")
-            course_ans = input("\033[32m" + "조회를 희망하는 강의의 과목코드를 입력하시요: " + "\033[0m")
+            course_ans = input("\033[32m" + "조회를 희망하는 강의의 과목코드를 입력하시요: " + "\033[0m").strip()
+            if not re.fullmatch(r"[A-Za-z0-9]{1,20}", course_ans):
+                print("\033[31m" + "과목코드는 영문/숫자만 입력 가능합니다." + "\033[0m")
+                driver.quit()
+                return
             page_url = f"https://hisnet.handong.edu/SMART/lp_view_4student_1.php?kang_yy={year}&kang_hakgi={term}&kang_hakgwa=0013&kang_code={course_ans}&kang_ban=01&kang_cs_code=&kang_cs_ban="
             driver.get(page_url)
             sleep(1)

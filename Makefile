@@ -15,7 +15,7 @@ endif
 
 init:
 	$(python) -m pip install $(pip_user_option) --upgrade pip
-	$(python) -m pip install $(pip_user_option) -r requirements.txt
+	$(python) -m pip install $(pip_user_option) -r requirements-dev.txt
 	$(python) -m pre_commit install
 
 lint:
